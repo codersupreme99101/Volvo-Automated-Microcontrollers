@@ -5,4 +5,4 @@ Microcontroller code for RPi4, ESP32 and MQTT protocol via IIoT feature device d
 
 Run boot.py only
 
-Refer to _ for Magtag 2.9" related specific code
+Refer to https://github.com/codersupreme99101/Magtag_Volvo for Magtag 2.9" related specific code (bitmap file conversion and display, with button toggles)
