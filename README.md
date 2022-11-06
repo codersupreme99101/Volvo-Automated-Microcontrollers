@@ -5,4 +5,4 @@ Microcontroller code for RPi4, ESP32 and MQTT protocol via IIoT feature device d
 
 Run boot.py only
 
-Refer to https://github.com/codersupreme99101/Volvo-Automated-Microcontrollers for Magtag 2.9" related specific code
+Refer to _ for Magtag 2.9" related specific code
