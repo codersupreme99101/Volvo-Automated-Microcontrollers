@@ -18,7 +18,8 @@ class BinProtocol: #full ESP32 load measurer only
         self.sck=35
 
         self.red_pin=12
-        self.green_pin=14
+        self.green_pin=13
+        self.blue_pin=14
         self.on_pin=5
         
         self.r=None
@@ -35,19 +36,13 @@ class BinProtocol: #full ESP32 load measurer only
         self.time_quanta=tq #3 #1 #6 #0.006
 
         self.max_limit=max_lim #g #max wt as is as per load cell 100% capacity, mutable but hardset
-
-        self.incline_deg=8.746 #degrees
         
         self.flip=False #binary
-                
-        self.max_limit_over_ang=self.max_limit*math.sin(self.incline_deg)
-        
+                        
         self.iter_val_num=10 #avg over no. of samples
         self.check_calibration_ww=caltime #for w
-        
-        self.factor_w=1.8 #change-able
-        
-        self.wifi_ssid = "Bellaire Dojo"  # Enter Wifi SSID
+                
+        self.wifi_ssid = "Bellaire Dojo"  #"Cedar Lofts Dojo" # Enter Wifi SSID
         self.wifi_pass = "Z2wCAXMB" #"v7KTGKbe"  # Enter Wifi Pasword
 
         self.server = "mqtt3.thingspeak.com" # Enter Mqtt Broker Name
@@ -106,7 +101,7 @@ class BinProtocol: #full ESP32 load measurer only
             pass
 
         print('\nConnection to WLAN successful. \n')
-        time.sleep(10)
+        time.sleep(5)
         
         self.client = MQTTClient(self.client_id, self.server, self.port, self.user, self.password,60) 
         self.client.set_callback(self.callback)
@@ -133,15 +128,15 @@ class BinProtocol: #full ESP32 load measurer only
 
     def decide_color(self): #color scaler, conditional
 
-        if 0<=self.pw<=5:
+        if 0<=self.pw<=33:
             
             self.set_rgb(1,0) #red
 
-        elif 5<self.pw<=10:
+        elif 33<self.pw<=67:
             
             self.set_rgb(1,1) #yellow
 
-        elif 10<self.pw<=100:
+        elif 67<self.pw<=100:
             
             self.set_rgb(0,1) #green
 
@@ -149,16 +144,18 @@ class BinProtocol: #full ESP32 load measurer only
     
     def calibration_estimate(self, w): #math calc. ##edit function
         
-        known_dv=-444000
-        known_wt=39.689 #g
-        known_wt_ang=self.factor_w*known_wt*math.sin(self.incline_deg)
-        
-        ratio=known_dv/known_wt_ang
-        
-        bin_dv=-433000
+        known_dv=33700
+        known_wt=240 #g
+                
+        bin_dv=362000
         
         ratio=(known_dv-bin_dv)/known_wt
         new_w=(w-bin_dv)/ratio
+        
+        scaler=1
+        offset=0
+        
+        new_w=scaler*(new_w+offset) #linear transform 
             
         if new_w<0: #known weight: 1.4 oz=39.6893g #417314.7 -- digital
             new_w=0 #assumed at 0
@@ -192,12 +189,15 @@ class BinProtocol: #full ESP32 load measurer only
                     
                     print("\nComputed Weight: {}g\n".format(w_cal))
                     
-                    if iter%self.check_calibration_ww==0 and iter!=0 and self.preset==False:
+                    if iter==self.check_calibration_ww:
                     
                         print("\nNew 100% weight reference set, from {}g, to {}g\n".format(self.max_limit, w_cal))
                                             
-                        if w_cal==0:
-                            w_cal=1 #min gram set
+                        if w_cal<=0:
+                            w_cal=0.001 #min gram set
+                            
+                        if w_cal>=self.max_limit: #max gram set
+                            w_val=self.max_limit
                                                 
                         self.max_limit=w_cal
                         self.preset=True
@@ -217,7 +217,7 @@ class BinProtocol: #full ESP32 load measurer only
                     
                     perc_w=(w_cal/self.max_limit)*100
                     self.pw=perc_w
-                    print("\n{}% : {}g\n".format(w_cal, self.pw))
+                    print("\n{}% : {}g\n".format(self.pw, w_cal))
                     
                     sum_w+=w_cal
                                         
@@ -262,11 +262,11 @@ if __name__ == "__main__": #runs full class #here for now, in boot originally
     
     if id_no==0: #unique id
         
-        time.sleep(30) #default time for system calibration on firmware level
+        time.sleep(5) #default time for system calibration on firmware level
     
         tqt=1 #s
-        ml_m=5000 #g
-        ct=30 #s
+        ml_m=10000 #g
+        ct=15 #s
 
         bp=BinProtocol(tq=tqt, caltime=ct, max_lim=ml_m)
         bp.main()
