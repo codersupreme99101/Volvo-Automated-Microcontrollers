@@ -20,7 +20,7 @@ class BinProtocol: #full ESP32 load measurer only
         self.red_pin=12
         self.green_pin=13
         self.blue_pin=14
-        self.on_pin=5
+        self.on_pin=21
         
         self.r=None
         self.g=None
@@ -42,8 +42,8 @@ class BinProtocol: #full ESP32 load measurer only
         self.iter_val_num=10 #avg over no. of samples
         self.check_calibration_ww=caltime #for w
                 
-        self.wifi_ssid = "Bellaire Dojo"  #"Cedar Lofts Dojo" # Enter Wifi SSID
-        self.wifi_pass = "Z2wCAXMB" #"v7KTGKbe"  # Enter Wifi Pasword
+        self.wifi_ssid = "Arya's iPhone 13"#"Cedar Lofts Dojo"#"Bellaire Dojo"  #"Cedar Lofts Dojo" # Enter Wifi SSID
+        self.wifi_pass = "aryakeni" #"v7KTGKbe" #"Z2wCAXMB" #"v7KTGKbe"  # Enter Wifi Pasword
 
         self.server = "mqtt3.thingspeak.com" # Enter Mqtt Broker Name
 
@@ -128,15 +128,15 @@ class BinProtocol: #full ESP32 load measurer only
 
     def decide_color(self): #color scaler, conditional
 
-        if 0<=self.pw<=33:
+        if 0<=self.pw<=70:
             
             self.set_rgb(1,0) #red
 
-        elif 33<self.pw<=67:
+        elif 70<self.pw<=90:
             
             self.set_rgb(1,1) #yellow
 
-        elif 67<self.pw<=100:
+        elif 90<self.pw<=100:
             
             self.set_rgb(0,1) #green
 
@@ -144,15 +144,15 @@ class BinProtocol: #full ESP32 load measurer only
     
     def calibration_estimate(self, w): #math calc. ##edit function
         
-        known_dv=33700
+        known_dv=335000
         known_wt=240 #g
                 
-        bin_dv=362000
+        bin_dv=376600
         
         ratio=(known_dv-bin_dv)/known_wt
         new_w=(w-bin_dv)/ratio
         
-        scaler=1
+        scaler=2.15
         offset=0
         
         new_w=scaler*(new_w+offset) #linear transform 
@@ -163,7 +163,7 @@ class BinProtocol: #full ESP32 load measurer only
         if new_w>self.max_limit:
             new_w=self.max_limit
                     
-        return new_w
+        return (1.15*new_w)/1.1
 
     def process_read(self): #full true run of the read and data process
         
@@ -179,7 +179,9 @@ class BinProtocol: #full ESP32 load measurer only
     
             try:
                 
-                average=self.hx.read_average() #one method is fine, no need for raw and avg. reads 
+                average=self.hx.read_average() #one method is fine, no need for raw and avg. reads
+                
+                print(average)
                 
                 w=average
                                 
@@ -254,7 +256,7 @@ class BinProtocol: #full ESP32 load measurer only
 
         pass #process read call
     
-#"""
+"""
 
 if __name__ == "__main__": #runs full class #here for now, in boot originally 
     
@@ -271,4 +273,4 @@ if __name__ == "__main__": #runs full class #here for now, in boot originally
         bp=BinProtocol(tq=tqt, caltime=ct, max_lim=ml_m)
         bp.main()
         
-#"""
+"""

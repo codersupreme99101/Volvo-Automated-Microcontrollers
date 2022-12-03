@@ -5,12 +5,13 @@
 #webrepl.start()
 
 from full_protocol import BinProtocol
+import time
 
 #"""
 
 if __name__ == "__main__": #runs full class #here for now, in boot originally 
     
-    id_no=1
+    id_no=0
     
     if id_no==0: #unique id
         
