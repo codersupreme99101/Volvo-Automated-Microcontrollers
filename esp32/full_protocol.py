@@ -22,9 +22,13 @@ class BinProtocol: #full ESP32 load measurer only
         self.blue_pin=14
         self.on_pin=21
         
+        self.off_pin=33
+        
         self.r=None
         self.g=None
         self.o=None
+        
+        self.pp=None
         
         self.pw=-1 #percent by weight value
         
@@ -74,6 +78,8 @@ class BinProtocol: #full ESP32 load measurer only
         self.r=Pin(self.red_pin, Pin.OUT)
         self.g=Pin(self.green_pin, Pin.OUT)
         self.o=Pin(self.on_pin, Pin.OUT)
+        
+        self.pp=Pin(self.off_pin, Pin.OUT)
             
         self.dtp=Pin(self.dt, Pin.OUT)
         self.sckp=Pin(self.sck, Pin.IN)
@@ -230,7 +236,8 @@ class BinProtocol: #full ESP32 load measurer only
                 else:
 
                     print("\nInvalid sensor readings from Load Cell. Trying again...\n")
-                    
+                
+                self.pp.value(0)
                 self.o.value(1)
 
             except (OSError, KeyboardInterrupt, SystemExit):
@@ -274,3 +281,4 @@ if __name__ == "__main__": #runs full class #here for now, in boot originally
         bp.main()
         
 """
+

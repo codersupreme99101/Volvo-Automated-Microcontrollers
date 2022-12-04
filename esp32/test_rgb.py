@@ -8,11 +8,15 @@ class rgb_test():
         self.r=None
         self.g=None
         self.b=None
+        self.po=None
+        self.pow=None
         self.red_pin=12
         self.green_pin=13
         self.blue_pin=14
+        self.power_off=33
+        self.power_on=21
         
-        self.time_q=10
+        self.time_q=5
         
         
     def init_pins(self): #initializes pins to avoid re-init
@@ -20,6 +24,8 @@ class rgb_test():
         self.r=Pin(self.red_pin, Pin.OUT)
         self.g=Pin(self.green_pin, Pin.OUT)
         self.b=Pin(self.blue_pin, Pin.OUT)
+        self.po=Pin(self.power_off, Pin.OUT)
+        self.pow=Pin(self.power_on, Pin.OUT)
                 
         print("All Pins Set!")
         
@@ -30,6 +36,9 @@ class rgb_test():
         self.r.value(r_v)
         self.g.value(g_v)
         self.b.value(b_v)
+        
+        self.po.value(0)
+        self.pow.value(1)
         
         pass
     
@@ -63,3 +72,4 @@ if __name__ == "__main__": #runs full class
     
     
     
+
